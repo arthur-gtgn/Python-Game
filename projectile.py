@@ -2,17 +2,20 @@ import pygame
 import math
 
 
-class Projectile:
+class Projectile(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, radius, color):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, radius, player):
+        super().__init__()
+
+        self.player = player
+        self.image = pygame.image.load("assets/bullet.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.radius = radius
-        self.color = color
 
     def draw(self, window):
-        pygame.draw.circle(window, (0,0,0), (self.x, self.y), self.radius)
-        pygame.draw.circle(window, self.color, (self.x, self.y), self.radius-1)
+        window.blit(self.image, self.rect)
 
     @staticmethod
     def projectile_path(start_x, start_y, power, angle, time):
@@ -26,4 +29,8 @@ class Projectile:
         new_y = round(start_y - dist_y)
 
         return new_x, new_y
+
+    def collision(self):
+        if self.player.game.check_collision(self, self.player.game.all_foes):
+            return True
 
