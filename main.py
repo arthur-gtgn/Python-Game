@@ -7,7 +7,7 @@ wScreen = 1200
 hScreen = 500
 
 win = pygame.display.set_mode((wScreen, hScreen))
-pygame.display.set_caption("Transverse")
+pygame.display.set_caption("Sticks War")
 
 background = pygame.image.load("assets/background.png")
 banner = pygame.image.load("assets/banner.png")
@@ -83,7 +83,7 @@ while run:
 
         if shoot:
 
-            if game.player.projectile.rect.y < 350 - game.player.projectile.radius \
+            if game.player.projectile.rect.y < 400 - game.player.projectile.radius \
                     and game.player.projectile.rect.x < wScreen and \
                     not game.check_collision(game.player.projectile, game.all_foes):
                 time += 0.1
@@ -95,8 +95,8 @@ while run:
                 for foe in game.check_collision(game.player.projectile, game.all_foes):
                     foe.damage(game.player.attack)
                 shoot = False
-                game.player.projectile.rect.y = game.player.rect.y + 50
-                game.player.projectile.rect.x = game.player.rect.x + 50
+                game.player.projectile.rect.y = game.player.rect.y + 25
+                game.player.projectile.rect.x = game.player.rect.x + 25
 
     for event in pygame.event.get():
 
@@ -107,7 +107,6 @@ while run:
             if event.type == pygame.KEYDOWN:
                 game.pressed[event.key] = True
                 if game.pressed.get(pygame.K_SPACE):
-                    print("Hello World")
                     if shoot is False:
                         shoot = True
                         x = game.player.projectile.rect.x

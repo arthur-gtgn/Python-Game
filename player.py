@@ -19,11 +19,15 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         self.rect.x = 100
-        self.rect.y = 204
+        self.rect.y = 320
 
-        self.projectile = Projectile(self.rect.x + 50, self.rect.y + 50, 5, self)
+        self.projectile = Projectile(self.rect.x + 25, self.rect.y + 25, 5, self)
 
-    def damage(self, amount):
+    def add_hp(self, amount):
+        if self.health + amount < self.max_health:
+            self.health += amount
+
+    def damage(self, amount, window):
         if self.health - amount > amount:
             self.health -= amount
         else:
