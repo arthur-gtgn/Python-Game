@@ -52,8 +52,11 @@ while run:
     win.blit(background, (0, 0))
     win.blit(game.player.image, game.player.rect)
 
+    game.player.update_health_bar(win)
+
     for foe in game.all_foes:
         foe.forward()
+        foe.update_health_bar(win)
 
     game.all_foes.draw(win)
     pos = pygame.mouse.get_pos()
@@ -71,13 +74,14 @@ while run:
         if game.player.projectile.rect.y < 350 - game.player.projectile.radius \
                 and game.player.projectile.rect.x < wScreen and \
                 not game.check_collision(game.player.projectile, game.all_foes):
-
             time += 0.1
             po = Projectile.projectile_path(x, y, power, angle, time)
             game.player.projectile.rect.x = po[0]
             game.player.projectile.rect.y = po[1]
 
         else:
+            for foe in game.check_collision(game.player.projectile, game.all_foes):
+                foe.damage(game.player.attack)
             shoot = False
             game.player.projectile.rect.y = game.player.rect.y + 50
             game.player.projectile.rect.x = game.player.rect.x + 50

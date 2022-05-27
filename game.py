@@ -2,6 +2,7 @@ import pygame
 from player import Player
 from foe import Foe
 
+
 class Game:
 
     def __init__(self):
@@ -12,6 +13,9 @@ class Game:
 
         self.all_foes = pygame.sprite.Group()
         self.pressed = {}
+        self.spawn_monster()
+        self.spawn_monster()
+        self.spawn_monster()
         self.spawn_monster()
 
     def check_collision(self, sprite, group):
