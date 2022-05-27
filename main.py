@@ -7,7 +7,20 @@ wScreen = 1200
 hScreen = 500
 
 win = pygame.display.set_mode((wScreen, hScreen))
+pygame.display.set_caption("Transverse")
+
 background = pygame.image.load("assets/background.png")
+banner = pygame.image.load("assets/banner.png")
+
+play_button = pygame.image.load("assets/play.png")
+play_button_rect = play_button.get_rect()
+play_button_rect.x = 50
+play_button_rect.y = 150
+
+quit_button = pygame.image.load("assets/quit.png")
+quit_button_rect = quit_button.get_rect()
+quit_button_rect.x = 900
+quit_button_rect.y = 150
 
 x = 0
 y = 0
@@ -48,57 +61,67 @@ def redraw_window(shooting):
 
 
 run = True
+
 while run:
     win.blit(background, (0, 0))
-    win.blit(game.player.image, game.player.rect)
 
-    game.player.update_health_bar(win)
+    if game.is_playing:
+        game.update(win, wScreen)
+        pos = pygame.mouse.get_pos()
+        line = [(game.player.projectile.rect.x, game.player.projectile.rect.y), pos]
+        redraw_window(shoot)
+    else:
+        pos = None
+        line = None
+        win.blit(banner, (350, 110))
+        win.blit(play_button, (50, 150))
+        win.blit(quit_button, (900, 150))
 
-    for foe in game.all_foes:
-        foe.forward()
-        foe.update_health_bar(win)
+    pygame.display.update()
 
-    game.all_foes.draw(win)
-    pos = pygame.mouse.get_pos()
-    line = [(game.player.projectile.rect.x, game.player.projectile.rect.y), pos]
+    if game.is_playing:
 
-    if game.pressed.get(pygame.K_d) and game.player.rect.x + game.player.rect.width < wScreen:
-        game.player.move_right()
-    elif game.pressed.get(pygame.K_q) and game.player.rect.x > 0:
-        game.player.move_left()
+        if shoot:
 
-    redraw_window(shoot)
+            if game.player.projectile.rect.y < 350 - game.player.projectile.radius \
+                    and game.player.projectile.rect.x < wScreen and \
+                    not game.check_collision(game.player.projectile, game.all_foes):
+                time += 0.1
+                po = Projectile.projectile_path(x, y, power, angle, time)
+                game.player.projectile.rect.x = po[0]
+                game.player.projectile.rect.y = po[1]
 
-    if shoot:
-
-        if game.player.projectile.rect.y < 350 - game.player.projectile.radius \
-                and game.player.projectile.rect.x < wScreen and \
-                not game.check_collision(game.player.projectile, game.all_foes):
-            time += 0.1
-            po = Projectile.projectile_path(x, y, power, angle, time)
-            game.player.projectile.rect.x = po[0]
-            game.player.projectile.rect.y = po[1]
-
-        else:
-            for foe in game.check_collision(game.player.projectile, game.all_foes):
-                foe.damage(game.player.attack)
-            shoot = False
-            game.player.projectile.rect.y = game.player.rect.y + 50
-            game.player.projectile.rect.x = game.player.rect.x + 50
+            else:
+                for foe in game.check_collision(game.player.projectile, game.all_foes):
+                    foe.damage(game.player.attack)
+                shoot = False
+                game.player.projectile.rect.y = game.player.rect.y + 50
+                game.player.projectile.rect.x = game.player.rect.x + 50
 
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            print("Hello World")
-            if shoot is False:
-                shoot = True
-                x = game.player.projectile.rect.x
-                y = game.player.projectile.rect.y
-                time = 0
-                power = (math.sqrt((line[1][1] - line[0][1]) ** 2 + (line[1][0] - line[0][0]) ** 2)) / 8
-                angle = find_angle(pos)
-        elif event.type == pygame.KEYDOWN:
-            game.pressed[event.key] = True
-        elif event.type == pygame.KEYUP:
-            game.pressed[event.key] = False
+
+        if game.is_playing:
+            if event.type == pygame.KEYDOWN:
+                game.pressed[event.key] = True
+                if game.pressed.get(pygame.K_SPACE):
+                    print("Hello World")
+                    if shoot is False:
+                        shoot = True
+                        x = game.player.projectile.rect.x
+                        y = game.player.projectile.rect.y
+                        time = 0
+                        power = (math.sqrt((line[1][1] - line[0][1]) ** 2 + (line[1][0] - line[0][0]) ** 2)) / 8
+                        angle = find_angle(pos)
+
+            elif event.type == pygame.KEYUP:
+                game.pressed[event.key] = False
+
+        else:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button_rect.collidepoint(event.pos):
+                    game.start()
+                elif quit_button_rect.collidepoint(event.pos):
+                    run = False

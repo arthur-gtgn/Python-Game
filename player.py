@@ -26,6 +26,8 @@ class Player(pygame.sprite.Sprite):
     def damage(self, amount):
         if self.health - amount > amount:
             self.health -= amount
+        else:
+            self.game.wasted()
 
     def update_health_bar(self, surf):
         pygame.draw.rect(surf, (255, 0, 0), [self.rect.x - 26, self.rect.y - 20, self.max_health, 5])
